@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px  # using Plotly for interactive pie charts
 
 # Load dataset
 df = pd.read_csv("ecommerce_dataset.csv")
@@ -18,24 +19,27 @@ st.subheader("Graph 1: Top 10 Selling Products")
 top_products = df.groupby('product_id')['quantity'].sum().nlargest(10)
 st.bar_chart(top_products)
 
-# Graph 2: Revenue by Product Category
-st.subheader("Graph 2: Revenue by Product Category")
-category_revenue = df.groupby('category')['revenue'].sum().sort_values()
-st.bar_chart(category_revenue)
+# Graph 2: Revenue by Product Category (Pie Chart)
+st.subheader("Graph 2: Revenue Share by Category")
+category_revenue = df.groupby('category')['revenue'].sum().reset_index()
+fig2 = px.pie(category_revenue, names='category', values='revenue', title="Revenue by Category")
+st.plotly_chart(fig2)
 
 # Graph 3: Average Order Value by Region
 st.subheader("Graph 3: Average Order Value by Region")
 aov_region = df.groupby('region')['revenue'].mean()
 st.bar_chart(aov_region)
 
-# Graph 4: Discounts Distribution
+# Graph 4: Discounts Distribution (Histogram)
 st.subheader("Graph 4: Discount Distribution")
-st.histogram(df['discount']) if hasattr(st, "histogram") else st.line_chart(df['discount'].value_counts())
+st.bar_chart(df['discount'].value_counts().sort_index())
 
-# Graph 5: Payment Method Distribution
+# Graph 5: Payment Method Distribution (Pie Chart)
 st.subheader("Graph 5: Payment Method Distribution")
-payment_counts = df['payment_method'].value_counts()
-st.bar_chart(payment_counts)
+payment_counts = df['payment_method'].value_counts().reset_index()
+payment_counts.columns = ["payment_method", "count"]
+fig5 = px.pie(payment_counts, names='payment_method', values='count', title="Payment Method Share")
+st.plotly_chart(fig5)
 
 # Graph 6: Total Revenue by Region
 st.subheader("Graph 6: Total Revenue by Region")
